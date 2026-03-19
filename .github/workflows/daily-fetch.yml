@@ -33,7 +33,9 @@ jobs:
           EOF
 
       - name: Restore credentials
-        run: echo '${{ secrets.CREDENTIALS_JSON }}' > credentials.json
+        env:
+          CREDENTIALS: ${{ secrets.CREDENTIALS_JSON }}
+        run: printf '%s' "$CREDENTIALS" > credentials.json
 
       - name: Install dependencies
         run: npm ci
