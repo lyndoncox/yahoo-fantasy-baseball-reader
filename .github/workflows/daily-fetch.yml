@@ -46,6 +46,13 @@ jobs:
       - name: Fetch data
         run: npm start
 
+      - name: Update ACCESS_TOKEN secret
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          NEW_TOKEN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('credentials.json','utf8')).access_token)")
+          echo "$NEW_TOKEN" | gh secret set ACCESS_TOKEN --repo ${{ github.repository }}
+
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
