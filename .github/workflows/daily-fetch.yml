@@ -1,0 +1,50 @@
+name: Daily Fantasy Baseball Fetch
+
+on:
+  schedule:
+    - cron: '0 13 * * *'  # 8 AM ET — adjust to your timezone
+  workflow_dispatch:       # allows manual trigger from GitHub UI
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Create config.json from secrets
+        run: |
+          cat > config.json <<EOF
+          {
+            "CONSUMER_KEY": "${{ secrets.CONSUMER_KEY }}",
+            "CONSUMER_SECRET": "${{ secrets.CONSUMER_SECRET }}",
+            "YAHOO_AUTH_CODE": "${{ secrets.YAHOO_AUTH_CODE }}",
+            "LEAGUE_KEY": "${{ secrets.LEAGUE_KEY }}",
+            "TEAM": "${{ secrets.TEAM }}",
+            "AUTH_FILE": "./credentials.json",
+            "FREE_AGENTS": "${{ secrets.FREE_AGENTS }}"
+          }
+          EOF
+
+      - name: Restore credentials
+        run: echo '${{ secrets.CREDENTIALS_JSON }}' > credentials.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch data
+        run: npm start
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add allMyData.json
+          git diff --staged --quiet || git commit -m "chore: daily data update $(date -u +%Y-%m-%d)"
+          git push
