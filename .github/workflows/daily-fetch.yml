@@ -34,8 +34,11 @@ jobs:
 
       - name: Restore credentials
         env:
-          CREDENTIALS: ${{ secrets.CREDENTIALS_JSON }}
-        run: printf '%s' "$CREDENTIALS" | tr -d '\000-\037' > credentials.json
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        run: |
+          printf '{"access_token":"%s","refresh_token":"%s","expires_in":3600,"token_type":"bearer"}' \
+            "$ACCESS_TOKEN" "$REFRESH_TOKEN" > credentials.json
 
       - name: Install dependencies
         run: npm ci
