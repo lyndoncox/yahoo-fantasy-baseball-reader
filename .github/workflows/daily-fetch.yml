@@ -35,7 +35,7 @@ jobs:
       - name: Restore credentials
         env:
           CREDENTIALS: ${{ secrets.CREDENTIALS_JSON }}
-        run: printf '%s' "$CREDENTIALS" > credentials.json
+        run: printf '%s' "$CREDENTIALS" | tr -d '\000-\037' > credentials.json
 
       - name: Install dependencies
         run: npm ci
