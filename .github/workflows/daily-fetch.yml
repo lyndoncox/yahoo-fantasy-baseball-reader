@@ -19,18 +19,16 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Create config.json from secrets
+        env:
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          YAHOO_AUTH_CODE: ${{ secrets.YAHOO_AUTH_CODE }}
+          LEAGUE_KEY: ${{ secrets.LEAGUE_KEY }}
+          TEAM: ${{ secrets.TEAM }}
+          FREE_AGENTS: ${{ secrets.FREE_AGENTS }}
         run: |
-          cat > config.json <<EOF
-          {
-            "CONSUMER_KEY": "${{ secrets.CONSUMER_KEY }}",
-            "CONSUMER_SECRET": "${{ secrets.CONSUMER_SECRET }}",
-            "YAHOO_AUTH_CODE": "${{ secrets.YAHOO_AUTH_CODE }}",
-            "LEAGUE_KEY": "${{ secrets.LEAGUE_KEY }}",
-            "TEAM": "${{ secrets.TEAM }}",
-            "AUTH_FILE": "./credentials.json",
-            "FREE_AGENTS": "${{ secrets.FREE_AGENTS }}"
-          }
-          EOF
+          printf '{"CONSUMER_KEY":"%s","CONSUMER_SECRET":"%s","YAHOO_AUTH_CODE":"%s","LEAGUE_KEY":"%s","TEAM":"%s","AUTH_FILE":"./credentials.json","FREE_AGENTS":"%s"}' \
+            "$CONSUMER_KEY" "$CONSUMER_SECRET" "$YAHOO_AUTH_CODE" "$LEAGUE_KEY" "$TEAM" "$FREE_AGENTS" > config.json
 
       - name: Restore credentials
         env:
